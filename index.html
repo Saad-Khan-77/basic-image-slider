@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Slider</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .slider {
+        width: 80%;
+        max-width: 600px;
+        height: 350px;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+      }
+
+      .slides {
+        display: flex;
+        transition: transform 0.5s ease;
+      }
+
+      .slide {
+        min-width: 100%;
+        height: 350px;
+      }
+
+      .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+
+        border: none;
+        padding: 18px;
+        cursor: pointer;
+        /* center the symbol and make circle */
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .prev {
+        left: 10px;
+      }
+      .next {
+        right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slider">
+      <div class="slides" id="slides">
+        <div class="slide"><img src="https://picsum.photos/id/1015/800/500" /></div>
+        <div class="slide"><img src="https://picsum.photos/id/1016/800/500" /></div>
+        <div class="slide"><img src="https://picsum.photos/id/1018/800/500" /></div>
+        <div class="slide"><img src="https://picsum.photos/id/1019/800/500" /></div>
+      </div>
+      <button onclick=" prevSlide()" class="btn prev" id="prevBtn">&#10094;</button>
+      <button onclick="nextSlide()" class="btn next" id="nextBtn">&#10095;</button>
+    </div>
+
+    <script>
+      const slides = document.getElementById("slides");
+      let slideItems = document.querySelectorAll(".slide");
+
+      // ===== Clone first and last slide for loop =====
+      const firstClone = slideItems[0].cloneNode(true);
+      const lastClone = slideItems[slideItems.length - 1].cloneNode(true);
+
+      slides.appendChild(firstClone);
+      slides.insertBefore(lastClone, slideItems[0]);
+
+      slideItems = document.querySelectorAll(".slide");
+      const totalSlides = slideItems.length;
+
+      // Starting me ek clone slide (0 index) hai, isliye slider ko index=1 par set karte hain
+      // translateX(-100%) ka matlab: 1 slide left shift, jisse asli first image dikh jaye
+      let index = 1;
+      slides.style.transform = `translateX(-${index * 100}%)`;
+
+      // ===== Next & Prev functions =====
+      function nextSlide() {
+        if (index >= totalSlides - 1) return;
+        index++;
+        slides.style.transition = `transform 0.5s ease`;
+        slides.style.transform = `translateX(-${index * 100}%)`;
+      }
+
+      function prevSlide() {
+        if (index <= 0) return;
+        index--;
+        slides.style.transition = `transform 0.5s ease`;
+        slides.style.transform = `translateX(-${index * 100}%)`;
+      }
+
+      // ===== Transition end - handle loop =====
+      slides.addEventListener("transitionend", () => {
+        if (slideItems[index].isSameNode(firstClone)) {
+          console.log("👉 First clone par tha (last index), ab turant jump karke second image (index 1) par aaya hoon");
+          slides.style.transition = "none";
+          index = 1;
+          slides.style.transform = `translateX(-${index * 100}%)`;
+        }
+
+        if (slideItems[index].isSameNode(lastClone)) {
+          console.log("👉 Last clone par tha (first index), ab turant jump karke last image (index " + (totalSlides - 2) + ") par aaya hoon");
+          slides.style.transition = "none";
+          index = totalSlides - 2;
+          slides.style.transform = `translateX(-${index * 100}%)`;
+        }
+      });
+
+      // // ===== Autoplay =====
+      let autoPlay = setInterval(nextSlide, 3000);
+      const slider = document.querySelector(".slider");
+      slider.addEventListener("mouseenter", () => clearInterval(autoPlay));
+      slider.addEventListener("mouseleave", () => (autoPlay = setInterval(nextSlide, 3000)));
+    </script>
+  </body>
+</html>
